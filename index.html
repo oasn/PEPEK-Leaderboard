@@ -91,6 +91,7 @@
     const hash = '60e5236d9f66068880f4604e97898bcf';
     const proxyUrl = 'https://api.allorigins.win/get?url=';
     const targetUrl = 'https://yayayayayayay.com/leaderboard?hash=' + hash;
+    let previousData = [];
 
     async function fetchLeaderboard() {
         try {
@@ -102,31 +103,31 @@
             const items = doc.querySelectorAll('.leaderboard-item');
 
             const leaderboard = document.getElementById('leaderboard');
-            const oldItems = leaderboard.querySelectorAll('.leaderboard-item');
-            const oldValues = Array.from(oldItems).map(item => parseInt(item.textContent.split(': ')[1].split(' ')[0]));
-            leaderboard.innerHTML = '';
-            items.forEach((item, index) => {
-                if (index < 5) {
-                    const div = document.createElement('div');
-                    div.className = 'leaderboard-item';
-                    div.innerHTML = item.innerHTML;
-                    leaderboard.appendChild(div);
+            const newData = Array.from(items).slice(0, 5).map(item => item.textContent);
 
-                    const oldValue = oldValues[index];
-                    const newValue = parseInt(item.textContent.split(': ')[1].split(' ')[0]);
-                    if (oldValue !== newValue) {
-                        div.classList.add('changed');
-                        const changeIndicator = document.createElement('div');
-                        changeIndicator.className = 'change-indicator';
-                        changeIndicator.textContent = `+${newValue - oldValue}`;
-                        div.appendChild(changeIndicator);
-                        setTimeout(() => {
-                            div.classList.remove('changed');
-                            changeIndicator.remove();
-                        }, 4000);
-                    }
+            leaderboard.innerHTML = '';
+            newData.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'leaderboard-item';
+                div.textContent = item;
+                leaderboard.appendChild(div);
+
+                const oldValue = previousData[index] ? parseInt(previousData[index].split(': ')[1].split(' ')[0]) : 0;
+                const newValue = parseInt(item.split(': ')[1].split(' ')[0]);
+                if (oldValue !== newValue) {
+                    div.classList.add('changed');
+                    const changeIndicator = document.createElement('div');
+                    changeIndicator.className = 'change-indicator';
+                    changeIndicator.textContent = `+${newValue - oldValue}`;
+                    div.appendChild(changeIndicator);
+                    setTimeout(() => {
+                        div.classList.remove('changed');
+                        changeIndicator.remove();
+                    }, 4000);
                 }
             });
+
+            previousData = newData;
         } catch (error) {
             console.error('Error fetching leaderboard:', error);
             document.getElementById('leaderboard').innerHTML = 'Error fetching leaderboard';
@@ -135,7 +136,7 @@
 
     function startFetchingLeaderboard() {
         fetchLeaderboard();
-        setInterval(fetchLeaderboard, 10000); // Fetch every 10 seconds
+        setInterval(fetchLeaderboard, 5000); // Fetch every 5 seconds
     }
 
     document.addEventListener('DOMContentLoaded', startFetchingLeaderboard);
