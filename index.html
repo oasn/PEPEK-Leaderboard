@@ -36,11 +36,32 @@
             padding: 15px;
             border-radius: 5px;
             font-size: 18px;
+            position: relative;
             transition: transform 0.5s, background-color 0.5s;
         }
         .leaderboard-item.changed {
             transform: scale(1.1);
             background-color: #76eec6;
+        }
+        .change-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            animation: fadeOut 1s ease-out 2s forwards;
+        }
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
         }
         .navigation {
             margin-top: 20px;
@@ -82,7 +103,7 @@
 
             const leaderboard = document.getElementById('leaderboard');
             const oldItems = leaderboard.querySelectorAll('.leaderboard-item');
-            const oldValues = Array.from(oldItems).map(item => item.textContent);
+            const oldValues = Array.from(oldItems).map(item => parseInt(item.textContent.split(': ')[1].split(' ')[0]));
             leaderboard.innerHTML = '';
             items.forEach((item, index) => {
                 if (index < 5) {
@@ -92,10 +113,17 @@
                     leaderboard.appendChild(div);
 
                     const oldValue = oldValues[index];
-                    const newValue = item.textContent;
+                    const newValue = parseInt(item.textContent.split(': ')[1].split(' ')[0]);
                     if (oldValue !== newValue) {
                         div.classList.add('changed');
-                        setTimeout(() => div.classList.remove('changed'), 1000);
+                        const changeIndicator = document.createElement('div');
+                        changeIndicator.className = 'change-indicator';
+                        changeIndicator.textContent = `+${newValue - oldValue}`;
+                        div.appendChild(changeIndicator);
+                        setTimeout(() => {
+                            div.classList.remove('changed');
+                            changeIndicator.remove();
+                        }, 3000);
                     }
                 }
             });
