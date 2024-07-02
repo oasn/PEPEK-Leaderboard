@@ -107,7 +107,7 @@
 
     function startFetchingLeaderboard() {
         fetchLeaderboard();
-        setInterval(fetchLeaderboard, 1000); // Fetch every 1 second
+        setInterval(fetchLeaderboard, 5000); // Fetch every 5 seconds
     }
 
     document.addEventListener('DOMContentLoaded', startFetchingLeaderboard);
